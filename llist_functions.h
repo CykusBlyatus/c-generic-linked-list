@@ -13,7 +13,7 @@
 void *llist_node_allocf(void *head_ptr_ptr, size_t node_size, void *(*allocator)(size_t));
 
 /**
- * @brief Linked List Node Pop Front: Removes the first element of a linked list, given its head and a deallocator
+ * @brief Linked List Node Pop Front Full: Removes the first element of a linked list, given its head and a deallocator
  * @param head  list_node(T)**: Pointer to the address (to a pointer, not to the head itself!) of the head of the linked list
  */
 void llist_node_popf_f(void *head_ptr_ptr, void (*deallocator)(void*));

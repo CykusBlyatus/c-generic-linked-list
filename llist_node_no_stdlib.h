@@ -13,6 +13,12 @@
         T val;\
     }
 
+/**
+ * @brief Linked List Node Push Front Full: Adds an element to the beginning of a linked list, given its head and an allocator
+ * @param head  list_node(T)**: Pointer to the address (to a pointer, not to the head itself!) of the head of the linked list
+ * @param value Value to add
+ * @param allocator A memory allocator, like the "malloc" function from <stdlib.h>
+ */
 #define llist_node_pushf_f(head, value, allocator) do {\
     llist_node_allocf(head, sizeof(**(head)), allocator);\
     (*(head))->val = value;\

@@ -17,6 +17,11 @@
  */
 #define llist_pushf_f(self, value, allocator) llist_node_pushf_f(&(self)->head, value, allocator)
 
+/**
+ * @brief Linked List Pop Front Full: Removes the first element of a linked list, given its head and a deallocator
+ * @param head  list_node(T)**: Pointer to the address (to a pointer, not to the head itself!) of the head of the linked list
+ * @param deallocator A memory deallocator, like the "free" function from <stdlib.h>
+ */
 #define llist_popf_f(self, deallocator) llist_node_popf_f(&(self)->head, deallocator)
 
 /**
