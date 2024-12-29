@@ -1,12 +1,16 @@
 #include <llist.h>
 #include <stdio.h>
 
+#define llist(T)\
+    struct {\
+        llist_node(T) *head;\
+    }
+
 int main() {
-    llist(int) list;
-    llist_init(&list);
+    llist(int) list = {};
 
     for (int i = 0; i < 5; ++i)
-        llist_push_front(&list, i);
+        llist_pushf(&list, i);
 
     typeof(list.head) last = NULL;
     for (typeof(list.head) node = list.head; node != NULL; node = node->next) {
