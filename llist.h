@@ -16,80 +16,111 @@
 /**
  * @brief Linked List Destruct: Deallocates all nodes of a linked list
  * @param self Pointer to a struct that has an attribute called "head" that is a pointer to a type of llist_node(T)
- * @note If you wish to use a node whose name is not "head", see llist_node_destruct
  */
-#define llist_destruct(self) llist_node_destruct(&(self)->head)
+#define llist_destruct(self) llist_destruct_f(self, free)
+
+/**
+ * @brief Linked List Destruct Full: Deallocates all nodes of a linked list
+ * @param self Pointer to a struct that has an attribute called "head" that is a pointer to a type of llist_node(T)
+ * @param deallocator A memory deallocator, like the "free" function from <stdlib.h>
+ */
+#define llist_destruct_f(self, deallocator) llist_node_destruct_f(&(self)->head, deallocator)
 
 /**
  * @brief Linked List Node Destruct: Deallocates all nodes of a linked list, given its head
- * @param head llist_node(T)** (Pointer to a pointer to a type of llist_note(T)).
- *             The extra "*" is to make it clear that the head is a pointer whose address will be changed.
+ * @param head list_node(T)**: Pointer to the address (to a pointer, not to the head itself!) of the head of the linked list
  */
-#define llist_node_destruct(head) do {\
-    for (typeof(*(head)) node = *(head); node != NULL;) {\
-        void *tmp = node->next;\
-        free(node);\
-        node = tmp;\
-    }\
-    *(head) = NULL;\
-} while(0)
+#define llist_node_destruct(head) llist_node_destruct_f(head, free)
+
+/**
+ * @brief Linked List Node Destruct Full: Deallocates all nodes of a linked list, given its head and a deallocator
+ * @param head_ptr_ptr list_node(T)**: Pointer to the address (to a pointer, not to the head itself!) of the head of the linked list
+ * @param deallocator A memory deallocator, like the "free" function from <stdlib.h>
+ */
+void llist_node_destruct_f(void *head_ptr_ptr, void (*deallocator)(void*));
 
 /**
  * @brief Linked List Push Front: Adds a value to the beginning of a linked list
  * @param self Pointer to a struct that has an attribute called "head" that is a pointer to a type of llist_node(T)
  * @param value Value to add
- * @note If you wish to use a node whose name is not "head", see llist_node_pushf
  */
-#define llist_pushf(self,value) llist_node_pushf(&(self)->head,value)
+#define llist_pushf(self, value) llist_pushf_f(self, value, malloc)
+
+/**
+ * @brief Linked List Push Front Full: Adds a value to the beginning of a linked list
+ * @param self Pointer to a struct that has an attribute called "head" that is a pointer to a type of llist_node(T)
+ * @param value Value to add
+ */
+#define llist_pushf_f(self, value, allocator) llist_node_pushf_f(&(self)->head, value, allocator)
 
 /**
  * @brief Linked List Node Push Front: Adds an element to the beginning of a linked list, given its head
- * @param head llist_node(T)** (Pointer to a pointer to a type of llist_note(T)).
- *             The extra "*" is to make it clear that the head is a pointer whose address will be changed.
+ * @param head  list_node(T)**: Pointer to the address (to a pointer, not to the head itself!) of the head of the linked list
  * @param value Value to add
  */
-#define llist_node_pushf(head,value) do {\
-    typeof(*(head)) node = malloc(sizeof(**(head)));\
-    node->val = value;\
-    node->next = *(head);\
-    *(head) = node;\
+#define llist_node_pushf(head, value) llist_node_pushf_f(head, value, malloc)
+
+#define llist_node_pushf_f(head, value, allocator) do {\
+    llist_node_allocf(head, sizeof(**(head)), allocator);\
+    (*(head))->val = value;\
 } while(0)
+
+/**
+ * @brief Linked List Node Allocate Front: Adds a node with an unitialized value to the beginning of a linked list, given its head and a memory allocator
+ * @param head_ptr_ptr list_node(T)**: Pointer to the address (to a pointer, not to the head itself!) of the head of the linked list
+ * @param allocator A memory allocator, like the "malloc" function from <stdlib.h>
+ * @return void* On success, returns the new head of the linked list (which should be equal to the (updated) value *head_ptr_ptr).
+                 On failure, returns NULL.
+ */
+void *llist_node_allocf(void *head_ptr_ptr, size_t node_size, void *(*allocator)(size_t));
 
 /**
  * @brief Linked List Pop Front: Removes the first element of a linked list
  * @param self Pointer to a struct that has an attribute called "head" that is a pointer to a type of llist_node(T)
  * @param value Value to add
- * @note If you wish to use a node whose name is not "head", see llist_node_popf
  */
 #define llist_popf(self) llist_node_popf(&(self)->head)
 
+#define llist_popf_f(self, deallocator) llist_node_popf_f(&(self)->head, deallocator)
+
 /**
  * @brief Linked List Node Pop Front: Removes the first element of a linked list, given its head
- * @param head llist_node(T)** (Pointer to a pointer to a type of llist_note(T)).
- *             The extra "*" is to make it clear that the head is a pointer whose address will be changed.
+ * @param head  list_node(T)**: Pointer to the address (to a pointer, not to the head itself!) of the head of the linked list
  */
-#define llist_node_popf(head) do {\
-    typeof(*(head)) new_head = (*(head))->next;\
-    free(*(head));\
-    *(head) = new_head;\
-} while(0)
+#define llist_node_popf(head) llist_node_popf_f(head, free)
+
+void llist_node_popf_f(void *head_ptr_ptr, void (*deallocator)(void*));
 
 /**
  * @brief Linked List Foreach: Iterates over a Linked List
  * @param self Pointer to a struct that has an attribute called "head" that is a pointer to a type of llist_node(T)
  * @param node Variable name for the node
  */
-#define llist_foreach(self,node) for (typeof((self)->head) node = (self)->head; node != NULL; node = node->next)
+#define llist_foreach(self, node) llist_node_foreach((self)->head, node)
+
+/**
+ * @brief Linked List Node Foreach: Iterates over a Linked List, given its head
+ * @param head list_node(T)*: Pointer to the head of the linked list
+ * @param node Variable name for the node
+ */
+#define llist_node_foreach(head, node) for (typeof(head) node = head; node != NULL; node = node->next)
 
 /**
  * @brief Circular Linked List Foreach: Iterates over a Circular Linked List
  * @param self Pointer to a struct that has an attribute called "head" that is a pointer to a type of llist_node(T)
  * @param node Variable name for the node
  */
-#define cllist_foreach(self,node)\
+#define cllist_foreach(self, node) cllist_node_foreach((self)->head, node)\
+
+/**
+ * @brief Circular Linked List Node Foreach: Iterates over a Linked List, given its head
+ * @param head list_node(T)*: Pointer to the head of the circular linked list
+ * @param node Variable name for the node
+ */
+#define cllist_node_foreach(head, node)\
     for (\
-        typeof((self)->head) node = (self)->head, _cllist_foreach_flag = 0;\
-        node != (self)->head || !(_cllist_foreach_flag++);\
+        typeof(head) node = head, _cllist_foreach_flag = 0;\
+        node != head || !(_cllist_foreach_flag++);\
         node = node->next\
     )
 
